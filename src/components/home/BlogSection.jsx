@@ -1,0 +1,113 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Loader } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+
+const CATEGORY_LABELS = {
+  inspirace: 'Inspirace',
+  realizace: 'Realizace',
+  technika: 'Technologie',
+  novinky: 'Novinky'
+};
+
+const FALLBACK_BG = '/media/optimized/48d543124_generated_image.webp';
+
+const FALLBACK = [
+{
+  id: 'f1', slug: 'vyhody-mlznych-systemu-mestske-prostory',
+  title: '7 výhod instalace mlžných systémů v městských prostorech',
+  perex: 'Mlžítka pro města pomáhají vytvářet příjemnější mikroklima na náměstích, sportovištích i v parcích.',
+  image_url: '/media/optimized/48d543124_generated_image.webp',
+  category: 'technika', published_date: '2026-06-29', published: true
+},
+{
+  id: 'f2', slug: 'evaporace-mikroklima',
+  title: 'Jak evaporace mění mikroklima veřejných prostorů',
+  perex: 'Jak vodní mlha na veřejná prostranství podporuje komfort v horkých dnech a proč záleží na návrhu prostoru.',
+  image_url: '/media/optimized/1e0142d25_Mlzitko-v-mestskem-parku-VDMA.webp',
+  category: 'technika', published_date: '2026-06-01', published: true
+}];
+
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long' });
+}
+
+function PostCard({ post, i }) {
+  const bg = post.image_url || FALLBACK_BG;
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
+      <Link to={`/blog/${post.slug || post.id}`}
+      className="group relative block h-64 overflow-hidden rounded-2xl border border-white/10 shadow-sm transition-all hover:shadow-lg sm:h-72">
+        <img src={bg} alt={post.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/5" />
+        <div className="relative flex h-full flex-col justify-end p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[10px] font-mono text-white/80 tracking-widest uppercase px-2.5 py-1 backdrop-blur-sm border border-white/20 rounded-full bg-[hsl(var(--card-foreground))]">
+              {CATEGORY_LABELS[post.category] || post.category || 'Článek'}
+            </span>
+            {post.published_date && <span className="text-[10px] font-mono text-[hsl(var(--popover-foreground))] bg-[hsl(var(--popover))]">{formatDate(post.published_date)}</span>}
+          </div>
+          <h3 className="text-white tracking-tight leading-snug mb-2 group-hover:text-white/80 transition-colors line-clamp-2 normal-case [font-family:'Plus_Jakarta_Sans',_'Helvetica_Neue',_Helvetica,_Arial,_sans-serif] text-xl font-semibold">
+            {post.title}
+          </h3>
+          
+          <div className="flex items-center gap-2 text-xs text-white font-medium group-hover:gap-3 transition-all">
+            Číst článek <ArrowRight size={12} />
+          </div>
+        </div>
+      </Link>
+    </motion.div>);
+
+}
+
+export default function BlogSection() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    base44.entities.BlogPost.list('-published_date').
+    then((items) => {
+      const published = (items || []).filter((p) => p.published);
+      setPosts(published.length > 0 ? published : FALLBACK);
+    }).
+    catch(() => setPosts(FALLBACK)).
+    finally(() => setLoading(false));
+  }, []);
+
+  const latestTwo = posts.slice(0, 2);
+
+  return (
+    <section className="bg-slate-950 py-16 sm:py-20 lg:py-24">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="mb-8 sm:mb-10 lg:mb-12">
+          <p className="font-mono tracking-widest uppercase mb-3 text-sm text-[hsl(var(--card))]">NOVINKY & ZNALOSTI</p>
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+            <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
+            className="font-heading text-[clamp(2rem,8vw,2.4rem)] font-light tracking-[-0.03em] text-white lg:text-3xl">
+Nové příspěvky blogu
+            </motion.h2>
+            <Link to="/blog" className="btn-metallic-mist inline-flex min-h-12 w-full items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-[hsl(var(--card))] transition-all hover:gap-3 hover:text-white sm:w-auto">Všechny články
+
+            </Link>
+          </div>
+        </motion.div>
+
+        {/* Blog posts */}
+        {loading ?
+        <div className="flex justify-center py-14">
+            <Loader size={22} className="animate-spin text-white/30" />
+          </div> :
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {latestTwo.map((post, i) => <PostCard key={post.id} post={post} i={i} />)}
+          </div>
+        }
+      </div>
+    </section>);
+
+}

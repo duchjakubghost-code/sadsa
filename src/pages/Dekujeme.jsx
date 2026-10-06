@@ -1,0 +1,65 @@
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { CheckCircle2, Phone, Mail, ArrowRight } from 'lucide-react';
+import { trackThankYouPageView } from '@/lib/ga4';
+import { setSEO } from '@/lib/seo';
+
+const SOURCE_LABELS = {
+  poptavka: 'poptávku',
+  kontakt: 'poptávku',
+  produkt: 'poptávku produktu',
+};
+
+export default function Dekujeme() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const zdroj = urlParams.get('zdroj') || 'kontakt';
+
+  useEffect(() => {
+    setSEO({ title: 'Děkujeme za poptávku', description: 'Vaše poptávka byla úspěšně odeslána.', canonicalPath: '/dekujeme', robots: 'noindex, follow' });
+    trackThankYouPageView(zdroj);
+  }, [zdroj]);
+
+  return (
+    <div className="min-h-screen bg-white pt-28 flex items-center justify-center px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-lg w-full text-center py-16"
+      >
+        <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-6 border border-slate-200">
+          <CheckCircle2 size={30} className="text-slate-900" />
+        </div>
+        <p className="text-xs font-mono tracking-widest uppercase text-slate-400 mb-3">Odesláno</p>
+        <h1 className="font-heading font-light text-3xl lg:text-4xl text-slate-900 tracking-tight mb-4">
+          Děkujeme za vaši {SOURCE_LABELS[zdroj] || 'poptávku'}!
+        </h1>
+        <p className="text-slate-500 leading-relaxed mb-10">
+          Potvrzení jsme vám poslali také e-mailem. Náš technický tým projde zadání a ozve se s dalším postupem; v případě potřeby můžete kontaktovat Ing. Radka Medunu.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-10">
+          <a href="tel:+420774700390"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium hover:border-slate-300 transition-all">
+            <Phone size={15} /> +420 774 700 390
+          </a>
+          <a href="mailto:meduna@holmtec.cz"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium hover:border-slate-300 transition-all">
+            <Mail size={15} /> meduna@holmtec.cz
+          </a>
+        </div>
+
+        <div className="flex flex-col items-center justify-center gap-3">
+          <Link to="/klientska-sekce" className="inline-flex items-center gap-2 rounded-full bg-[#0d2d38] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#123c49]">
+            Otevřít klientskou sekci <ArrowRight size={14} />
+          </Link>
+          <p className="max-w-sm text-xs leading-5 text-slate-400">Použijte stejný e-mail, který jste uvedli v poptávce. Při prvním vstupu můžete použít jednorázový kód nebo Google účet se stejnou e-mailovou adresou.</p>
+          <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-900 transition-colors text-sm font-mono">
+            Zpět na web <ArrowRight size={14} />
+          </Link>
+        </div>
+      </motion.div>
+    </div>
+  );
+}

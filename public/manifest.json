@@ -1,0 +1,15 @@
+{
+  "name": "MLŽIDLA.cz — chytré mlžení",
+  "short_name": "MLŽIDLA.cz",
+  "description": "Mlžítka a mlžné systémy pro města, veřejné prostory, zahrady a terasy.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#071A2F",
+  "theme_color": "#071A2F",
+  "lang": "cs",
+  "icons": [
+    {"src":"/favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}

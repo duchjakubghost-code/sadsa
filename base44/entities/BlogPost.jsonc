@@ -1,0 +1,192 @@
+{
+  "name": "BlogPost",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Post title"
+    },
+    "slug": {
+      "type": "string",
+      "description": "URL slug"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "inspirace",
+        "realizace",
+        "technika",
+        "novinky"
+      ],
+      "description": "Category"
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "firmy",
+        "soukrome",
+        "oboji"
+      ],
+      "default": "oboji",
+      "description": "C\u00edlov\u00e1 skupina \u010dl\u00e1nku \u2014 firmy (gastro, eventy, obce) nebo soukrom\u00ed z\u00e1kazn\u00edci (zahrady)"
+    },
+    "perex": {
+      "type": "string",
+      "description": "Short excerpt"
+    },
+    "content": {
+      "type": "string",
+      "description": "Full HTML/markdown content"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Cover image URL"
+    },
+    "image_alt": {
+      "type": "string",
+      "description": "Popisn\u00fd alt text tituln\u00edho obr\u00e1zku pro p\u0159\u00edstupnost, SEO a AEO"
+    },
+    "content_images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "alt": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "photo",
+              "visualization",
+              "diagram"
+            ],
+            "default": "visualization"
+          }
+        },
+        "required": [
+          "url",
+          "alt"
+        ]
+      },
+      "description": "Dopl\u0148kov\u00e9 fotografie a vizualizace zobrazovan\u00e9 uvnit\u0159 detailu \u010dl\u00e1nku"
+    },
+    "related_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "url"
+        ]
+      },
+      "description": "Kontextov\u00e9 intern\u00ed odkazy souvisej\u00edc\u00ed s t\u00e9matem \u010dl\u00e1nku"
+    },
+    "seo_title": {
+      "type": "string",
+      "description": "Voliteln\u00fd SEO title; pokud chyb\u00ed, pou\u017eije se title"
+    },
+    "seo_description": {
+      "type": "string",
+      "description": "Voliteln\u00fd meta description do cca 155 znak\u016f; pokud chyb\u00ed, pou\u017eije se perex"
+    },
+    "location_context": {
+      "type": "string",
+      "description": "Lokalitn\u00ed kontext \u010dl\u00e1nku nebo realizace, nap\u0159. Ji\u010d\u00edn, Poln\u00e1, Trutnov"
+    },
+    "faq_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "question",
+          "answer"
+        ]
+      },
+      "description": "FAQ pro AEO a FAQPage structured data; pouze ov\u011b\u0159en\u00e9 odpov\u011bdi z \u010dl\u00e1nku a technick\u00fdch dat"
+    },
+    "related_product_slugs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Slugs produkt\u016f pro intern\u00ed prolinkov\u00e1n\u00ed z \u010dl\u00e1nku"
+    },
+    "published": {
+      "type": "boolean",
+      "default": false,
+      "description": "Published state"
+    },
+    "published_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Publish date"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags"
+    },
+    "cta_label": {
+      "type": "string",
+      "description": "Text tla\u010d\u00edtka prodejn\u00ed v\u00fdzvy na konci \u010dl\u00e1nku (legacy; na detailu blogu se ji\u017e nezobrazuje)"
+    },
+    "cta_link": {
+      "type": "string",
+      "description": "C\u00edlov\u00e1 str\u00e1nka prodejn\u00ed v\u00fdzvy (legacy; na detailu blogu se ji\u017e nezobrazuje)"
+    },
+    "instagram_posted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Zda byl \u010dl\u00e1nek u\u017e automaticky sd\u00edlen na Instagram"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

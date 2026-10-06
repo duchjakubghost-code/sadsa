@@ -1,0 +1,233 @@
+{
+  "name": "ProjectOrder",
+  "type": "object",
+  "properties": {
+    "inquiry_id": {
+      "type": "string",
+      "description": "Odkaz na zdrojovou popt\u00e1vku"
+    },
+    "inquiry_type": {
+      "type": "string",
+      "enum": [
+        "contact",
+        "poptavka"
+      ]
+    },
+    "project_name": {
+      "type": "string"
+    },
+    "client_name": {
+      "type": "string"
+    },
+    "client_email": {
+      "type": "string"
+    },
+    "client_phone": {
+      "type": "string"
+    },
+    "client_company": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "product_id": {
+      "type": "string"
+    },
+    "product_slug": {
+      "type": "string"
+    },
+    "product_name": {
+      "type": "string"
+    },
+    "quote_number": {
+      "type": "string"
+    },
+    "quote_pdf_url": {
+      "type": "string"
+    },
+    "inquiry_pdf_url": {
+      "type": "string"
+    },
+    "order_confirmation_pdf_url": {
+      "type": "string"
+    },
+    "drive_case_folder_id": {
+      "type": "string"
+    },
+    "drive_case_folder_url": {
+      "type": "string"
+    },
+    "presentation_url": {
+      "type": "string"
+    },
+    "presentation_pdf_url": {
+      "type": "string"
+    },
+    "notebook_source_url": {
+      "type": "string"
+    },
+    "presentation_variant": {
+      "type": "string",
+      "enum": [
+        "city_public",
+        "residential",
+        "wellness_hospitality",
+        "architecture_design",
+        "custom"
+      ]
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ar_url": {
+      "type": "string"
+    },
+    "smart_control_included": {
+      "type": "boolean",
+      "default": false
+    },
+    "sender_email": {
+      "type": "string",
+      "enum": [
+        "meduna@holmtec.cz",
+        "info@mlzidla.cz"
+      ]
+    },
+    "bcc_recipients": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "pending_approval",
+        "sent",
+        "viewed",
+        "extension_requested",
+        "approved",
+        "expired",
+        "rejected",
+        "in_production",
+        "ready",
+        "delivered"
+      ],
+      "default": "draft"
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "acceptance_terms_version": {
+      "type": "string"
+    },
+    "acceptance_name": {
+      "type": "string"
+    },
+    "acceptance_user_agent": {
+      "type": "string"
+    },
+    "validity_extension_requested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "validity_extension_note": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "estimated_order_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "estimated_order_window": {
+      "type": "string"
+    },
+    "customer_message": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "last_customer_action_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "production_start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "completion_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "delivery_method": {
+      "type": "string",
+      "enum": [
+        "pickup",
+        "delivery",
+        "installation"
+      ]
+    },
+    "delivery_location": {
+      "type": "string"
+    },
+    "total_price": {
+      "type": "number"
+    },
+    "production_notes": {
+      "type": "string"
+    },
+    "special_requirements": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "supplier_contact_name": {
+      "type": "string"
+    },
+    "supplier_email": {
+      "type": "string"
+    },
+    "supplier_phone": {
+      "type": "string"
+    },
+    "shared_token": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_name",
+    "client_name",
+    "client_email"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

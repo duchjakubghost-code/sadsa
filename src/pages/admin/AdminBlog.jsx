@@ -1,0 +1,155 @@
+import React, { useState, useEffect } from 'react';
+import { Plus, Loader, Pencil, Trash2, Eye, EyeOff, Copy } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import BlogPostForm from '@/components/admin/BlogPostForm';
+
+const EMPTY_FORM = { title: '', slug: '', category: '', audience: 'oboji', perex: '', content: '', image_url: '', image_alt: '', content_images: [], seo_title: '', seo_description: '', location_context: '', faq_text: '', related_product_slugs: '', related_links_text: '', tags: '', published: false };
+
+export default function AdminBlog() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(null); // null = list, 'new' or post.id
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+
+  const loadPosts = () => {
+    setLoading(true);
+    base44.entities.BlogPost.list('-created_date').then(setPosts).finally(() => setLoading(false));
+  };
+
+  useEffect(() => { loadPosts(); }, []);
+
+  const startNew = () => { setForm(EMPTY_FORM); setEditing('new'); };
+  const startEdit = (post) => {
+    setForm({
+      title: post.title || '', slug: post.slug || '', category: post.category || '',
+      audience: post.audience || 'oboji',
+      perex: post.perex || '', content: post.content || '', image_url: post.image_url || '', image_alt: post.image_alt || '',
+      content_images: Array.isArray(post.content_images) ? post.content_images : [],
+      seo_title: post.seo_title || '', seo_description: post.seo_description || '', location_context: post.location_context || '',
+      faq_text: (post.faq_items || []).map((item) => `${item.question} | ${item.answer}`).join('\n'),
+      related_product_slugs: (post.related_product_slugs || []).join(', '),
+      related_links_text: (post.related_links || []).map((item) => `${item.label} | ${item.url}${item.description ? ` | ${item.description}` : ''}`).join('\n'),
+      tags: (post.tags || []).join(', '), published: !!post.published,
+    });
+    setEditing(post.id);
+  };
+
+  const handleDuplicate = async (post) => {
+    await base44.entities.BlogPost.create({
+      title: `${post.title} (kopie)`,
+      slug: `${post.slug || ''}-kopie-${Date.now()}`,
+      category: post.category, audience: post.audience || 'oboji',
+      perex: post.perex, content: post.content, image_url: post.image_url, image_alt: post.image_alt,
+      content_images: post.content_images || [],
+      seo_title: post.seo_title, seo_description: post.seo_description, location_context: post.location_context,
+      faq_items: post.faq_items || [], related_product_slugs: post.related_product_slugs || [], related_links: post.related_links || [],
+      tags: post.tags || [], published: false,
+    });
+    loadPosts();
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const faq_items = (form.faq_text || '').split('\n').map((line) => {
+      const [question, ...answerParts] = line.split('|');
+      return { question: (question || '').trim(), answer: answerParts.join('|').trim() };
+    }).filter((item) => item.question && item.answer);
+    const related_product_slugs = (form.related_product_slugs || '').split(',').map((slug) => slug.trim()).filter(Boolean);
+    const related_links = (form.related_links_text || '').split('\n').map((line) => {
+      const [label, url, ...descriptionParts] = line.split('|');
+      return { label: (label || '').trim(), url: (url || '').trim(), description: descriptionParts.join('|').trim() };
+    }).filter((item) => item.label && item.url);
+    const fallbackFaq = faq_items.length ? faq_items : [
+      {
+        question: `Co je hlavním tématem článku „${form.title}“?`,
+        answer: (form.perex || '').trim() || `Článek shrnuje hlavní souvislosti tématu „${form.title}“ a navazující možnosti řešení.`,
+      },
+      {
+        question: form.category === 'novinky' ? 'Kde najdu související produkty nebo další novinky?' : 'Kde najdu další související informace?',
+        answer: form.category === 'novinky'
+          ? 'Navazující odkazy a související produkty jsou uvedené pod článkem. Další aktuality najdete v sekci Blog a novinky.'
+          : 'Navazující obsah, produkty a další relevantní stránky jsou uvedené v odkazech pod článkem.',
+      },
+    ];
+    const { faq_text, related_product_slugs: relatedProductSlugsInput, related_links_text: relatedLinksInput, ...persistedForm } = form;
+    const payload = {
+      ...persistedForm,
+      content_images: (form.content_images || []).filter((item) => item?.url && item?.alt),
+      faq_items: fallbackFaq,
+      related_product_slugs,
+      related_links,
+      tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+      published_date: form.published ? new Date().toISOString().slice(0, 10) : undefined,
+    };
+    if (editing === 'new') await base44.entities.BlogPost.create(payload);
+    else await base44.entities.BlogPost.update(editing, payload);
+    setSaving(false);
+    setEditing(null);
+    loadPosts();
+  };
+
+  const togglePublished = async (post) => {
+    await base44.entities.BlogPost.update(post.id, { published: !post.published });
+    loadPosts();
+  };
+
+  const handleDelete = async (post) => {
+    if (!window.confirm(`Smazat článek "${post.title}"?`)) return;
+    await base44.entities.BlogPost.delete(post.id);
+    loadPosts();
+  };
+
+  if (editing) {
+    return (
+      <div className="p-8 max-w-3xl">
+        <h2 className="text-white text-xl font-light mb-6">{editing === 'new' ? 'Nový článek' : 'Upravit článek'}</h2>
+        <BlogPostForm form={form} setForm={setForm} onSave={handleSave} onCancel={() => setEditing(null)}
+          saving={saving} uploadingCover={uploadingCover} setUploadingCover={setUploadingCover} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-8">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-white text-xl font-light">Blog</h2>
+        <button onClick={startNew} className="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan text-ink text-sm font-bold rounded-full hover:bg-cyan/90 transition-all">
+          <Plus size={15} /> Nový článek
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-16"><Loader size={24} className="animate-spin text-white/30" /></div>
+      ) : posts.length === 0 ? (
+        <p className="text-white/40 text-sm">Zatím žádné články.</p>
+      ) : (
+        <div className="space-y-2">
+          {posts.map(post => (
+            <div key={post.id} className="flex items-center gap-4 p-4 rounded-xl bg-card_bg border border-white/10">
+              {post.image_url && <img src={post.image_url} alt={post.title} className="w-16 h-12 object-cover rounded-lg shrink-0" />}
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-sm font-medium truncate">{post.title}</p>
+                <p className="text-white/40 text-xs">{post.category} · {post.published ? 'Publikováno' : 'Koncept'}</p>
+              </div>
+              <button onClick={() => togglePublished(post)} title={post.published ? 'Skrýt' : 'Publikovat'}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:bg-white/10 transition-all">
+                {post.published ? <Eye size={15} /> : <EyeOff size={15} />}
+              </button>
+              <button onClick={() => startEdit(post)} className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:bg-white/10 transition-all">
+                <Pencil size={15} />
+              </button>
+              <button onClick={() => handleDuplicate(post)} title="Duplikovat" className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:bg-white/10 transition-all">
+                <Copy size={15} />
+              </button>
+              <button onClick={() => handleDelete(post)} className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:bg-red-500/20 hover:text-red-400 transition-all">
+                <Trash2 size={15} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,108 @@
+{
+  "name": "Realizace",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Project name"
+    },
+    "client": {
+      "type": "string",
+      "description": "Client name"
+    },
+    "location": {
+      "type": "string",
+      "description": "Location"
+    },
+    "year": {
+      "type": "number",
+      "description": "Year of realization"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "mestsky",
+        "event",
+        "soukromy",
+        "prumyslovy"
+      ],
+      "description": "Category"
+    },
+    "description": {
+      "type": "string",
+      "description": "Project description"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Main image URL"
+    },
+    "gallery_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Gallery images"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "URL videa realizace (pokud existuje)"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "Odkaz na to, jak realizaci sd\u00edl\u00ed klient (nap\u0159. p\u0159\u00edsp\u011bvek na Facebooku/Instagramu klienta)"
+    },
+    "product_used": {
+      "type": "string",
+      "description": "Product model used"
+    },
+    "benefits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "2\u20134 konkr\u00e9tn\u00ed p\u0159\u00ednosy realizace zobrazovan\u00e9 v case study"
+    },
+    "concept_image_url": {
+      "type": "string",
+      "description": "Vizualizace, skica nebo n\u00e1vrhov\u00fd obraz projektu"
+    },
+    "project_sheet_url": {
+      "type": "string",
+      "description": "Fotografie nebo render A3 projektov\u00e9ho listu v kontextu m\u00edsta"
+    },
+    "design_note": {
+      "type": "string",
+      "description": "Kr\u00e1tk\u00e1 pozn\u00e1mka k n\u00e1vrhu, rozhodnut\u00ed nebo hodnot\u011b projektu"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Show on homepage"
+    },
+    "published": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
